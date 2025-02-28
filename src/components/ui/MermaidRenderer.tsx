@@ -13,6 +13,15 @@ mermaid.initialize({
   theme: 'dark',
   securityLevel: 'loose',
   logLevel: 'error',
+  themeVariables: {
+    // Personalizando colores para un aspecto neón
+    primaryColor: '#8B5CF6', // Purple
+    primaryTextColor: '#fff',
+    primaryBorderColor: '#7C3AED',
+    lineColor: '#6EE7B7', // Green
+    secondaryColor: '#3B82F6', // Blue
+    tertiaryColor: '#1E1E2E', // Background
+  },
 });
 
 interface MermaidRendererProps {
@@ -46,6 +55,13 @@ export default function MermaidRenderer({ code }: MermaidRendererProps) {
             
             // Render the diagram
             await mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            
+            // Add neon effects to the SVG
+            const svgElement = containerRef.current.querySelector('svg');
+            if (svgElement) {
+              svgElement.classList.add('neon-svg');
+              svgElement.style.filter = 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.6))';
+            }
           }
         } catch (error) {
           console.error('Error rendering mermaid diagram:', error);
@@ -58,12 +74,12 @@ export default function MermaidRenderer({ code }: MermaidRendererProps) {
   }, [code]);
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center overflow-auto p-4 bg-purple-900/20 rounded-lg">
+    <div className="w-full h-full flex flex-col justify-center items-center overflow-auto p-4 bg-purple-900/10 backdrop-blur-sm rounded-lg border border-purple-500/20">
       {renderError ? (
-        <div className="p-4 text-red-500 bg-red-100 rounded-md w-full">
+        <div className="p-4 text-red-500 bg-red-900/20 rounded-md w-full border border-red-500/30">
           <p>Error rendering diagram:</p>
-          <pre className="mt-2 p-2 bg-red-50 rounded overflow-auto">{renderError}</pre>
-          <pre className="mt-2 p-2 bg-gray-100 rounded overflow-auto">{code}</pre>
+          <pre className="mt-2 p-2 bg-red-900/10 rounded overflow-auto">{renderError}</pre>
+          <pre className="mt-2 p-2 bg-gray-800/80 rounded overflow-auto text-gray-300">{code}</pre>
         </div>
       ) : (
         <div ref={containerRef} className="w-full flex justify-center items-center">

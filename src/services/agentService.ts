@@ -5,7 +5,7 @@
 import axios from 'axios';
 
 // Webhook URL for the n8n agent
-const WEBHOOK_URL = 'https://n8n.cognitiveds.ai/webhook-test/agent';
+const WEBHOOK_URL = 'https://danielcarreon.app.n8n.cloud/webhook-test/agent';
 
 // Interface for the agent response
 interface AgentResponse {
@@ -19,10 +19,39 @@ interface AgentResponse {
  */
 export async function sendMessageToAgent(message: string): Promise<AgentResponse> {
   try {
-    const response = await axios.post(WEBHOOK_URL, { message });
+    console.log('Sending message to webhook:', message);
+    console.log('Webhook URL:', WEBHOOK_URL);
+    
+    // Using axios with proper configuration for debugging
+    const response = await axios.post(WEBHOOK_URL, 
+      // Payload structure - may need to be adjusted based on the webhook's expected format
+      { 
+        message,
+        // You might need additional fields based on the webhook's requirements
+        // timestamp: new Date().toISOString(),
+        // source: 'web-client'
+      }, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        // Increase timeout if the webhook is slow to respond
+        timeout: 30000
+      }
+    );
+    
+    console.log('Response received:', response.status, response.statusText);
+    console.log('Response data:', response.data);
     
     // Process the response to extract mermaid code if present
-    const responseText = response.data.text || response.data.toString();
+    // The actual response format may differ - adjust based on what n8n actually returns
+    const responseText = typeof response.data === 'string' 
+      ? response.data 
+      : response.data.text || response.data.message || response.data.toString();
+    
+    console.log('Processed response text:', responseText);
+    
     const mermaidRegex = /```mermaid\n([\s\S]*?)```/g;
     
     const matches = [...responseText.matchAll(mermaidRegex)];
@@ -32,6 +61,7 @@ export async function sendMessageToAgent(message: string): Promise<AgentResponse
     if (matches.length > 0) {
       // Extract the mermaid code
       mermaidCode = matches[0][1];
+      console.log('Mermaid code found:', mermaidCode);
       
       // Remove the mermaid code from the response text
       processedText = responseText.replace(mermaidRegex, '');
@@ -42,7 +72,36 @@ export async function sendMessageToAgent(message: string): Promise<AgentResponse
       mermaidCode
     };
   } catch (error) {
-    console.error('Error communicating with agent:', error);
-    throw new Error('Failed to communicate with agent');
+    // Enhanced error handling with detailed information
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error communicating with agent:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers,
+          data: error.config?.data
+        }
+      });
+      
+      // Provide more specific error messages based on the error
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('La conexión con el agente ha excedido el tiempo de espera. Por favor, intenta nuevamente.');
+      }
+      
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        throw new Error(`Error del servidor: ${error.response.status} ${error.response.statusText}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        throw new Error('No se recibió respuesta del servidor. Verifica tu conexión a internet.');
+      }
+    }
+    
+    console.error('Error comunicándose con el agente:', error);
+    throw new Error('No se pudo comunicar con el agente. Por favor, intenta nuevamente.');
   }
 } 

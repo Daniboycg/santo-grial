@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
-import { Manrope } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-const manrope = Manrope({ subsets: ['latin'] })
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-jetbrains'
+})
 
 export const metadata: Metadata = {
   title: 'Santo Grial - Tu Agente Inteligente',
@@ -16,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={manrope.className}>{children}</body>
+      <body className={`${jetbrainsMono.className} font-mono`}>{children}</body>
     </html>
   )
 }

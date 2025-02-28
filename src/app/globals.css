@@ -12,6 +12,11 @@
   --secondary: 56, 189, 248;  /* Cyan */
   --accent: 236, 72, 153;     /* Pink */
   --neutral: 30, 30, 46;      /* Dark */
+  
+  /* Neon effects */
+  --neon-purple: 149, 76, 233;
+  --neon-blue: 59, 130, 246;
+  --neon-pink: 219, 39, 119;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,4 +68,28 @@ body {
   box-shadow: 0 0 5px rgba(var(--primary), 0.7),
               0 0 10px rgba(var(--primary), 0.5),
               0 0 15px rgba(var(--primary), 0.3);
+}
+
+/* Neon message bubbles for user messages */
+.neon-message-user {
+  background: linear-gradient(135deg, rgba(var(--neon-purple), 0.4), rgba(var(--neon-blue), 0.2));
+  box-shadow: 0 0 15px rgba(var(--neon-purple), 0.5),
+              inset 0 0 8px rgba(var(--neon-blue), 0.3);
+  border: 1px solid rgba(var(--neon-purple), 0.3);
+}
+
+/* Neon message bubbles for agent messages */
+.neon-message-agent {
+  background: linear-gradient(135deg, rgba(var(--neutral), 0.9), rgba(var(--neutral), 0.7));
+  box-shadow: 0 0 10px rgba(var(--neon-blue), 0.3),
+              inset 0 0 8px rgba(var(--neon-blue), 0.1);
+  border: 1px solid rgba(var(--neon-blue), 0.2);
+}
+
+/* Error message styling */
+.neon-message-error {
+  background: linear-gradient(135deg, rgba(180, 30, 30, 0.3), rgba(100, 10, 10, 0.2));
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.3),
+              inset 0 0 8px rgba(255, 50, 50, 0.1);
+  border: 1px solid rgba(255, 50, 50, 0.3);
 }

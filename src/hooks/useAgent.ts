@@ -12,6 +12,7 @@ interface UseAgentReturn {
   error: string | null;
   sendMessage: (message: string) => Promise<void>;
   hasMermaid: boolean;
+  clearError: () => void;
 }
 
 export function useAgent(): UseAgentReturn {
@@ -20,6 +21,9 @@ export function useAgent(): UseAgentReturn {
   const [mermaidCode, setMermaidCode] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Clear error message
+  const clearError = () => setError(null);
 
   /**
    * Sends a message to the agent and handles the response
@@ -32,8 +36,12 @@ export function useAgent(): UseAgentReturn {
       // Add user message to the list
       setMessages(prev => [...prev, { role: 'user', content: message }]);
       
+      console.log('Enviando mensaje al agente:', message);
+      
       // Send message to agent and get response
       const response = await sendMessageToAgent(message);
+      
+      console.log('Respuesta del agente recibida:', response);
       
       // Add agent response to the list
       setMessages(prev => [...prev, { role: 'agent', content: response.text }]);
@@ -43,8 +51,24 @@ export function useAgent(): UseAgentReturn {
         setMermaidCode(response.mermaidCode);
       }
     } catch (err) {
-      setError('Failed to communicate with the agent. Please try again.');
-      console.error(err);
+      // Extract the error message
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : 'Error desconocido al comunicarse con el agente';
+      
+      console.error('Error al comunicarse con el agente:', err);
+      
+      // Set a user-friendly error message and add it to the messages
+      setError(errorMessage);
+      
+      // Add error message to chat as a system message
+      setMessages(prev => [
+        ...prev, 
+        { 
+          role: 'agent', 
+          content: `⚠️ ${errorMessage}\n\nSugerencias:\n- Verifica que el servidor n8n esté ejecutándose\n- Revisa tu conexión a internet\n- Intenta nuevamente en unos momentos` 
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -56,6 +80,7 @@ export function useAgent(): UseAgentReturn {
     loading,
     error,
     sendMessage,
-    hasMermaid: mermaidCode !== null
+    hasMermaid: mermaidCode !== null,
+    clearError
   };
 } 

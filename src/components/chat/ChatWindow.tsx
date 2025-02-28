@@ -12,26 +12,45 @@ interface ChatWindowProps {
   loading: boolean;
   onSendMessage: (message: string) => void;
   expanded: boolean;
+  error?: string | null;
+  onClearError?: () => void;
 }
 
 export default function ChatWindow({ 
   messages, 
   loading, 
   onSendMessage,
-  expanded 
+  expanded,
+  error,
+  onClearError 
 }: ChatWindowProps) {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('connected');
   
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Update connection status based on error
+  useEffect(() => {
+    if (error) {
+      setConnectionStatus('disconnected');
+    } else {
+      setConnectionStatus('connected');
+    }
+  }, [error]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (inputMessage.trim() && !loading) {
+      // Clear any previous errors when sending a new message
+      if (onClearError) {
+        onClearError();
+      }
+      
       onSendMessage(inputMessage);
       setInputMessage('');
     }
@@ -39,14 +58,31 @@ export default function ChatWindow({
 
   return (
     <motion.div
-      className="flex flex-col h-full bg-gray-900 rounded-lg shadow-lg overflow-hidden"
+      className="flex flex-col h-full bg-gray-900 rounded-lg shadow-lg overflow-hidden neon-border"
       animate={{
         width: expanded ? '60%' : '100%'
       }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
+      {/* Chat header with status indicator */}
+      <div className="p-3 border-b border-gray-800 flex justify-between items-center">
+        <h2 className="text-lg font-medium text-white">Agente Santo Grial</h2>
+        <div className="flex items-center">
+          <div 
+            className={`w-2 h-2 rounded-full mr-2 ${
+              connectionStatus === 'connected' 
+                ? 'bg-green-500 animate-pulse' 
+                : 'bg-red-500'
+            }`} 
+          />
+          <span className="text-xs text-gray-400">
+            {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+          </span>
+        </div>
+      </div>
+      
       {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/50">
         <AnimatePresence>
           {messages.length === 0 ? (
             <motion.div 
@@ -54,7 +90,7 @@ export default function ChatWindow({
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center h-full text-center"
             >
-              <div className="text-purple-400 mb-2 text-2xl">✨ Santo Grial</div>
+              <div className="text-purple-400 mb-2 text-2xl neon-text">✨ Santo Grial</div>
               <p className="text-gray-400">
                 Haz una pregunta para comenzar a hablar con el agente.
               </p>
@@ -69,8 +105,10 @@ export default function ChatWindow({
                 transition={{ duration: 0.3 }}
                 className={`p-3 rounded-lg max-w-[80%] ${
                   message.role === 'user'
-                    ? 'bg-purple-700 ml-auto'
-                    : 'bg-gray-800 mr-auto'
+                    ? 'ml-auto neon-message-user'
+                    : message.content.startsWith('⚠️')
+                      ? 'mr-auto neon-message-error'
+                      : 'mr-auto neon-message-agent'
                 }`}
               >
                 <div className="text-sm text-gray-300 mb-1">
@@ -85,7 +123,7 @@ export default function ChatWindow({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-gray-800 p-3 rounded-lg max-w-[80%] mr-auto"
+              className="neon-message-agent p-3 rounded-lg max-w-[80%] mr-auto"
             >
               <div className="text-sm text-gray-300 mb-1">Agente</div>
               <div className="flex space-x-2">
