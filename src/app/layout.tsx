@@ -10,8 +10,8 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Santo Grial - Tu Agente Inteligente',
-  description: 'Interfaz para comunicarse con agentes de IA, con soporte para visualización de diagramas mermaid',
+  title: 'MultiAgent as a Service Workflow Creator - Generador de JSON para n8n',
+  description: 'Herramienta para generar JSON para n8n con visualización de diagramas mermaid',
 }
 
 export default function RootLayout({

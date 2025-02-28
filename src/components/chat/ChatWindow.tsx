@@ -66,7 +66,10 @@ export default function ChatWindow({
     >
       {/* Chat header with status indicator */}
       <div className="p-3 border-b border-gray-800 flex justify-between items-center">
-        <h2 className="text-lg font-medium text-white">Agente Santo Grial</h2>
+        <div className="flex items-center">
+          <div className="rounded-full w-3 h-3 bg-green-400 mr-2 animate-pulse"></div>
+          <h2 className="text-lg font-medium text-white">Agente de n8n</h2>
+        </div>
         <div className="flex items-center">
           <div 
             className={`w-2 h-2 rounded-full mr-2 ${
@@ -99,7 +102,7 @@ export default function ChatWindow({
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center h-full text-center"
             >
-              <div className="text-purple-400 mb-2 text-2xl neon-text">✨ Santo Grial</div>
+              <div className="text-purple-400 mb-2 text-2xl neon-text">✨ MultiAgent as a Service</div>
               <p className="text-gray-400">
                 Haz una pregunta para comenzar a hablar con el agente.
               </p>
