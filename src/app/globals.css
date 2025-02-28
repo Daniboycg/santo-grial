@@ -3,9 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 13, 5, 30;
+  --background-end-rgb: 5, 10, 30;
+  
+  /* Theme colors */
+  --primary: 139, 92, 246;    /* Purple */
+  --secondary: 56, 189, 248;  /* Cyan */
+  --accent: 236, 72, 153;     /* Pink */
+  --neutral: 30, 30, 46;      /* Dark */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,9 +25,42 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
+      to bottom right,
+      rgb(var(--background-start-rgb)),
       rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    );
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(var(--neutral), 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary), 0.6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--primary), 0.8);
+}
+
+/* Adding neon effect for specific elements */
+.neon-text {
+  text-shadow: 0 0 5px rgba(var(--secondary), 0.7),
+               0 0 10px rgba(var(--secondary), 0.5),
+               0 0 15px rgba(var(--secondary), 0.3);
+}
+
+.neon-border {
+  box-shadow: 0 0 5px rgba(var(--primary), 0.7),
+              0 0 10px rgba(var(--primary), 0.5),
+              0 0 15px rgba(var(--primary), 0.3);
 }
