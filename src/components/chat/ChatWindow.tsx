@@ -75,9 +75,18 @@ export default function ChatWindow({
                 : 'bg-red-500'
             }`} 
           />
-          <span className="text-xs text-gray-400">
+          <span className={`text-xs ${connectionStatus === 'connected' ? 'text-green-400' : 'text-red-400'}`}>
             {connectionStatus === 'connected' ? 'Conectado' : 'Desconectado'}
           </span>
+          {connectionStatus === 'disconnected' && (
+            <button 
+              onClick={onClearError}
+              className="ml-2 text-xs text-purple-400 hover:text-purple-300 underline"
+              title="Reintentar conexión"
+            >
+              Reintentar
+            </button>
+          )}
         </div>
       </div>
       

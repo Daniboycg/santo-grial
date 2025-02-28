@@ -4,7 +4,7 @@
  */
 import axios from 'axios';
 
-// Webhook URL for the n8n agent
+// Webhook URL for the n8n agent - asegúrate que esta URL es correcta
 const WEBHOOK_URL = 'https://danielcarreon.app.n8n.cloud/webhook-test/agent';
 
 // Interface for the agent response
@@ -22,24 +22,16 @@ export async function sendMessageToAgent(message: string): Promise<AgentResponse
     console.log('Sending message to webhook:', message);
     console.log('Webhook URL:', WEBHOOK_URL);
     
-    // Using axios with proper configuration for debugging
-    const response = await axios.post(WEBHOOK_URL, 
-      // Payload structure - may need to be adjusted based on the webhook's expected format
-      { 
-        message,
-        // You might need additional fields based on the webhook's requirements
-        // timestamp: new Date().toISOString(),
-        // source: 'web-client'
-      }, 
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        // Increase timeout if the webhook is slow to respond
-        timeout: 30000
-      }
-    );
+    // Usando GET en lugar de POST ya que el webhook está configurado para GET
+    const response = await axios.get(WEBHOOK_URL, {
+      // Enviando el mensaje como parámetro de consulta
+      params: { message },
+      headers: {
+        'Accept': 'application/json'
+      },
+      // Mantener el timeout para evitar esperas infinitas
+      timeout: 30000
+    });
     
     console.log('Response received:', response.status, response.statusText);
     console.log('Response data:', response.data);
