@@ -268,3 +268,226 @@ body {
   min-height: 42px;
   transition: height 0.1s ease-out;
 }
+
+/* Estilos para la ventana estática de chat */
+.static-chat-container {
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  scroll-behavior: smooth;
+}
+
+/* Estilos para los controles de navegación */
+.navigation-controls button {
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.navigation-controls button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Contador de mensajes no leídos */
+.unread-badge {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--secondary), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(var(--secondary), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--secondary), 0);
+  }
+}
+
+/* Mejoras en los botones de control */
+.scroll-control-button {
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(var(--primary), 0.2);
+  box-shadow: 0 0 8px rgba(var(--primary), 0.3);
+}
+
+.scroll-control-button:hover {
+  border-color: rgba(var(--primary), 0.5);
+  box-shadow: 0 0 12px rgba(var(--primary), 0.5);
+}
+
+/* Estilos para diagramas Mermaid */
+.mermaid-diagram-wrapper {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.mermaid-preview {
+  background-color: rgba(15, 15, 25, 0.6);
+  background-image: 
+    linear-gradient(rgba(var(--neon-cyan), 0.4) 3px, transparent 3px),
+    linear-gradient(90deg, rgba(var(--neon-cyan), 0.4) 3px, transparent 3px);
+  background-size: 25px 25px;
+  background-position: center center;
+  border: 1px solid rgba(var(--neon-cyan), 0.3);
+  box-shadow: 0 0 20px rgba(var(--neon-cyan), 0.15);
+  border-radius: 0.375rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  overflow: auto;
+  min-height: 200px;
+  cursor: grab; /* Agregar cursor de mano cuando se pasa por encima */
+  position: relative;
+  user-select: none; /* Prevenir selección de texto durante el arrastre */
+}
+
+.mermaid-preview.dragging {
+  cursor: grabbing; /* Cambiar a cursor de agarre cuando se está arrastrando */
+}
+
+.grid-pattern {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Contenedor para mover el diagrama */
+.diagram-container {
+  position: relative;
+  will-change: transform; /* Optimización para animaciones */
+  transition: transform 0.05s ease-out; /* Suaviza el movimiento */
+}
+
+/* Mejoras en los diagramas Mermaid */
+.mermaid-container .mermaid {
+  overflow: visible !important; /* Asegura que los diagramas no se recorten */
+  pointer-events: none; /* Permite que los eventos pasen a través del diagrama */
+}
+
+/* Estilos para los nodos del diagrama */
+.mermaid-container .mermaid .node rect,
+.mermaid-container .mermaid .node circle,
+.mermaid-container .mermaid .node polygon,
+.mermaid-container .mermaid .node path {
+  fill: rgba(var(--neon-blue), 0.2);
+  stroke: rgba(var(--neon-cyan), 0.8);
+  stroke-width: 2px;
+}
+
+.mermaid-container .mermaid .edgePath .path {
+  stroke: rgba(var(--neon-purple), 0.8);
+  stroke-width: 2px;
+}
+
+.mermaid-container .mermaid .arrowheadPath {
+  fill: rgba(var(--neon-purple), 0.8);
+}
+
+.mermaid-container .mermaid .edgeLabel {
+  background-color: rgba(15, 15, 25, 0.7);
+  color: rgba(var(--neon-cyan), 1);
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+}
+
+.mermaid-container .mermaid .label {
+  color: white;
+  font-weight: 500;
+}
+
+.mermaid-container .mermaid .cluster rect {
+  fill: rgba(var(--neon-blue), 0.1);
+  stroke: rgba(var(--neon-cyan), 0.4);
+  stroke-width: 1px;
+  rx: 5px;
+  ry: 5px;
+}
+
+/* Indicador de arrastre */
+.drag-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(var(--neon-cyan), 0.2);
+  color: rgba(var(--neon-cyan), 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  pointer-events: none; /* No bloquear interacciones */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mermaid-preview:hover .drag-indicator {
+  opacity: 1;
+}
+
+.mermaid-preview.dragging .drag-indicator {
+  opacity: 1;
+  background-color: rgba(var(--neon-cyan), 0.4);
+}
+
+/* Restablecer botón */
+.reset-position {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(var(--neon-purple), 0.4);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  opacity: 0;
+}
+
+.mermaid-preview:hover .reset-position,
+.mermaid-preview.dragging .reset-position {
+  opacity: 1;
+}
+
+.reset-position:hover {
+  background-color: rgba(var(--neon-purple), 0.7);
+}
+
+/* Efectos de animación para regenerar diagramas */
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.regenerating-diagram {
+  position: relative;
+}
+
+.regenerating-diagram::after {
+  content: "Regenerando...";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: rgba(var(--neon-cyan), 1);
+  font-size: 0.9rem;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+/* Mejoras en el código Mermaid */
+.mermaid-code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: rgba(var(--neon-cyan), 0.9);
+}
