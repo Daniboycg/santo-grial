@@ -17,6 +17,7 @@
   --neon-purple: 149, 76, 233;
   --neon-blue: 59, 130, 246;
   --neon-pink: 219, 39, 119;
+  --neon-cyan: 110, 231, 183; /* Cyan for diagrams */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,6 +36,36 @@ body {
       rgb(var(--background-end-rgb))
     );
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Application layout - solución para espacios morados */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.app-container {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Panel adaptables */
+.adaptive-panels {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Custom scrollbar */
@@ -68,6 +99,8 @@ body {
   box-shadow: 0 0 5px rgba(var(--primary), 0.7),
               0 0 10px rgba(var(--primary), 0.5),
               0 0 15px rgba(var(--primary), 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden; /* Contiene el contenido dentro de los bordes redondeados */
 }
 
 /* Neon message bubbles for user messages */
@@ -92,4 +125,146 @@ body {
   box-shadow: 0 0 15px rgba(255, 50, 50, 0.3),
               inset 0 0 8px rgba(255, 50, 50, 0.1);
   border: 1px solid rgba(255, 50, 50, 0.3);
+}
+
+/* Tool tips for diagram controls */
+.tooltip-trigger {
+  position: relative;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  z-index: 999;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--neon-cyan), 0.3);
+  box-shadow: 0 0 10px rgba(var(--neon-cyan), 0.2);
+}
+
+.tooltip-trigger:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Markdown styling for chat */
+.markdown-content {
+  width: 100%;
+}
+
+.markdown-content h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+  color: rgba(var(--secondary), 1);
+  border-bottom: 1px solid rgba(var(--secondary), 0.3);
+  padding-bottom: 0.25rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0.75rem 0 0.5rem;
+  color: rgba(var(--secondary), 0.9);
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0.5rem 0 0.25rem;
+  color: rgba(var(--secondary), 0.8);
+}
+
+.markdown-content p {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.markdown-content ul, .markdown-content ol {
+  margin: 0.5rem 0 0.5rem 1.5rem;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content code {
+  font-family: monospace;
+  background-color: rgba(var(--neutral), 0.5);
+  padding: 0.15rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background-color: rgba(var(--neutral), 0.7);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+  border: 1px solid rgba(var(--neon-blue), 0.2);
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid rgba(var(--neon-purple), 0.6);
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.markdown-content a {
+  color: rgba(var(--neon-blue), 1);
+  text-decoration: underline;
+  text-decoration-color: rgba(var(--neon-blue), 0.4);
+  transition: all 0.2s ease;
+}
+
+.markdown-content a:hover {
+  color: rgba(var(--neon-cyan), 1);
+  text-decoration-color: rgba(var(--neon-cyan), 0.8);
+}
+
+/* Animation for scroll button */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Textarea auto-sizing styles */
+.textarea-autoresize {
+  resize: none;
+  overflow: hidden;
+  min-height: 42px;
+  transition: height 0.1s ease-out;
 }

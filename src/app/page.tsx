@@ -28,7 +28,7 @@ export default function Home() {
   };
 
   return (
-    <main className={`flex h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 text-white ${fullscreen ? 'p-0' : 'p-4 md:p-8'} relative overflow-hidden`}>
+    <main className="app-layout bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 text-white relative">
       {/* Background grid effect */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(20,20,40,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,40,0.1)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black_70%)]"></div>
       
@@ -36,10 +36,10 @@ export default function Home() {
       <div className="absolute top-[20%] -left-[10%] w-[500px] h-[500px] rounded-full bg-purple-900/20 filter blur-[100px] opacity-50"></div>
       <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] rounded-full bg-blue-900/20 filter blur-[100px] opacity-50"></div>
       
-      <div className={`${fullscreen ? 'w-full h-full' : 'container mx-auto h-full'} flex flex-col relative z-10`}>
+      <div className={`app-container ${fullscreen ? 'p-0' : 'p-4 md:p-6'} relative z-10`}>
         {/* Header - hidden in fullscreen mode */}
         {!fullscreen && (
-          <header className="mb-6 text-center">
+          <header className="mb-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent neon-text tracking-tight">
               MultiAgent as a Service Workflow Creator
             </h1>
@@ -50,16 +50,23 @@ export default function Home() {
         )}
 
         {/* Main content */}
-        <div className="flex-1 flex gap-6 relative overflow-hidden">
+        <div className="adaptive-panels flex-1 gap-4 min-h-0">
           {/* Chat Window - hidden in fullscreen mode */}
-          <AnimatePresence>
-            {!fullscreen && (
+          {!fullscreen && (
+            <AnimatePresence>
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: expanded ? '60%' : '100%', opacity: 1 }}
+                animate={{ 
+                  width: expanded ? '60%' : '100%', 
+                  opacity: 1,
+                  flexGrow: expanded ? 0.6 : 1,
+                  flexShrink: expanded ? 0 : 0,
+                  flexBasis: expanded ? '60%' : '100%' 
+                }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                style={{ flexGrow: 1 }}
+                className="min-h-0 h-full"
+                style={{ minWidth: expanded ? '350px' : '100%' }}
               >
                 <ChatWindow 
                   messages={messages}
@@ -70,8 +77,8 @@ export default function Home() {
                   onClearError={clearError}
                 />
               </motion.div>
-            )}
-          </AnimatePresence>
+            </AnimatePresence>
+          )}
 
           {/* Mermaid Diagram Panel */}
           <AnimatePresence>
@@ -80,15 +87,19 @@ export default function Home() {
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ 
                   width: fullscreen ? '100%' : '40%', 
-                  opacity: 1 
+                  opacity: 1,
+                  flexGrow: fullscreen ? 1 : 0.4,
+                  flexShrink: 0,
+                  flexBasis: fullscreen ? '100%' : '40%'
                 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
                 className={`bg-gray-900/80 backdrop-blur-sm rounded-lg shadow-lg ${fullscreen ? 'p-0' : 'p-4'} flex flex-col neon-border`}
                 style={{ 
-                  height: fullscreen ? '100vh' : undefined,
+                  height: fullscreen ? '100vh' : 'auto',
                   margin: fullscreen ? 0 : undefined,
-                  borderRadius: fullscreen ? 0 : undefined
+                  borderRadius: fullscreen ? 0 : undefined,
+                  minWidth: fullscreen ? '100%' : '300px'
                 }}
               >
                 {/* Header is now inside MermaidRenderer component */}
@@ -102,12 +113,12 @@ export default function Home() {
                         setExpanded(false);
                       }
                     }}
-                    className="absolute top-0 right-0 z-10 text-gray-400 hover:text-white focus:outline-none rounded-full p-1 hover:bg-gray-800"
+                    className="absolute top-2 right-2 z-10 text-gray-400 hover:text-white focus:outline-none rounded-full p-1 hover:bg-gray-800 bg-black/30 backdrop-blur-sm"
                     aria-label="Cerrar diagrama"
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      className="h-6 w-6" 
+                      className="h-5 w-5" 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor"
@@ -137,7 +148,7 @@ export default function Home() {
 
         {/* Footer - hidden in fullscreen mode */}
         {!fullscreen && (
-          <footer className="mt-6 text-center text-sm text-gray-500">
+          <footer className="mt-4 text-center text-sm text-gray-500">
             <p>© {new Date().getFullYear()} Cognitive Data Solutions. Todos los derechos reservados.</p>
           </footer>
         )}
