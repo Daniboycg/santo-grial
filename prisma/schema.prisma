@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Configuración del generador de Prisma Client
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Configuración de la fuente de datos (Supabase PostgreSQL)
+// Usamos dos URLs: DATABASE_URL para la aplicación y DIRECT_URL para migraciones
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Usado para migraciones
+}
+
+// Modelo de Usuario
+model User {
+  id            Int      @id @default(autoincrement())
+  supabaseUserId String   @unique // ID de usuario en Supabase
+  email         String   @unique
+  name          String?
+  creditBalance Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relaciones
+  generations Generation[]
+  transactions Transaction[]
+
+  @@map("users") // Nombre de la tabla en la base de datos
+}
+
+// Modelo de Generación de JSON
+model Generation {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  prompt    String   @db.Text // El prompt que el usuario proporcionó
+  jsonResult String?  @db.Text // El resultado JSON generado
+  status    String   // "pending", "completed", "failed"
+  webhookCallId String? @unique // ID de la llamada al webhook de backend
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction?
+
+  @@map("generations")
+}
+
+// Modelo de Transacción (preparado para el futuro sistema de pagos)
+model Transaction {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  amount       Int      // Cantidad (positiva para compras, negativa para usos)
+  type         String   // "purchase", "usage", "refund", etc.
+  status       String   // "pending", "completed", "failed"
+  generationId Int?     @unique // Si la transacción está relacionada a una generación
+  stripeSessionId String? @unique // Para integraciones futuras con Stripe
+  createdAt    DateTime @default(now())
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generation Generation? @relation(fields: [generationId], references: [id])
+
+  @@map("transactions")
+}

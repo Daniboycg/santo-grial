@@ -48,6 +48,8 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
   const [renderError, setRenderError] = useState<string | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showGrid, setShowGrid] = useState(true);
+  const [lastClick, setLastClick] = useState(0); // Para detectar doble clic
+  const [selectedNode, setSelectedNode] = useState<Element | null>(null);
 
   useEffect(() => {
     async function renderDiagram() {
@@ -184,8 +186,30 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
   
   // Mouse event handlers for dragging
   const handleMouseDown = (e: MouseEvent) => {
-    if (e.target instanceof SVGElement || 
-        (e.target as Element).closest('svg')) {
+    if ((e.target instanceof SVGElement || 
+        (e.target as Element).closest('svg'))) {
+      e.preventDefault(); // Prevent text selection during drag
+      
+      // Check for double click
+      const now = Date.now();
+      if (now - lastClick < 300) {
+        // Double click detected - center and reset zoom
+        resetZoom();
+        setLastClick(0);
+        return;
+      }
+      setLastClick(now);
+      
+      // Check if clicked on a node
+      const target = e.target as Element;
+      const nodeElement = target.closest('.node');
+      if (nodeElement) {
+        setSelectedNode(nodeElement);
+        // Podríamos añadir una clase visual para mostrar que está seleccionado
+        nodeElement.classList.add('selected-node');
+        return;
+      }
+      
       setIsDragging(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       
@@ -200,9 +224,8 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
       // Change cursor to grabbing
       if (containerRef.current) {
         containerRef.current.style.cursor = 'grabbing';
+        document.body.style.userSelect = 'none'; // Prevent text selection
       }
-      
-      e.preventDefault(); // Prevent text selection during drag
     }
   };
   
@@ -214,10 +237,26 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
     
     containerRef.current.scrollLeft = scrollPosition.x - dx;
     containerRef.current.scrollTop = scrollPosition.y - dy;
+    
+    // Update the position state for grid background
+    setPosition({
+      x: position.x + dx * 0.5, // Parallax effect for grid
+      y: position.y + dy * 0.5
+    });
   };
   
   const handleMouseUp = () => {
     setIsDragging(false);
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grab';
+    }
+    document.body.style.userSelect = ''; // Restore text selection
+    
+    // Clear any selected node
+    if (selectedNode) {
+      selectedNode.classList.remove('selected-node');
+      setSelectedNode(null);
+    }
   };
   
   // Handle zoom in/out with smoother transitions
@@ -279,6 +318,54 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
   };
   
+  // Add keyboard shortcuts handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Spacebar + drag for pan (like in Figma)
+      if (e.code === 'Space' && containerRef.current) {
+        containerRef.current.style.cursor = 'grab';
+      }
+      
+      // Zoom shortcuts
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '=' || e.key === '+') {
+          e.preventDefault();
+          zoomIn();
+        } else if (e.key === '-') {
+          e.preventDefault();
+          zoomOut();
+        } else if (e.key === '0') {
+          e.preventDefault();
+          resetZoom();
+        }
+      }
+      
+      // Escape to exit fullscreen
+      if (e.key === 'Escape' && isFullscreen) {
+        onToggleFullscreen();
+      }
+      
+      // F key for fullscreen
+      if (e.key === 'f' && !isFullscreen) {
+        onToggleFullscreen();
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && containerRef.current) {
+        containerRef.current.style.cursor = 'auto';
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [zoomLevel, isFullscreen, onToggleFullscreen]);
+  
   if (renderError) {
     return (
       <div className="p-4 text-red-500 bg-red-900/20 rounded-md w-full border border-red-500/30">
@@ -301,7 +388,7 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
       {/* Background grid for better spatial awareness - conditionally rendered */}
       {showGrid && (
         <div 
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none grid-background"
           style={{
             backgroundImage: `
               linear-gradient(to right, rgba(60, 60, 100, 0.1) 1px, transparent 1px),
@@ -313,6 +400,14 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
           }}
         />
       )}
+      
+      {/* Indicador de arrastre */}
+      <div className="drag-indicator">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l3 3 3-3M19 9l3 3-3 3M5 15l-3 3 3 3M19 15l3 3-3 3M9 19l3 3 3-3M9 5V3M5 9H3M15 5V3M19 9h2M9 19v2M5 15H3M19 15h2M15 19v2"></path>
+        </svg>
+        Haz clic y arrastra para mover
+      </div>
       
       {/* Diagram container with scrolling and zooming */}
       <div 
@@ -327,18 +422,24 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
         }}
       />
       
-      {/* Zoom indicator */}
+      {/* Zoom indicator - improved styling */}
       <div
-        className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm"
+        className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm flex items-center gap-2"
         style={{
           zIndex: 20,
           border: '1px solid rgba(120, 255, 214, 0.3)'
         }}
       >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="14"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
         {(zoomLevel * 100).toFixed(0)}%
       </div>
       
-      {/* Controls - fixed to the bottom */}
+      {/* Controls - fixed to the bottom with improved styling */}
       <div 
         className="absolute bottom-0 left-0 right-0 h-16 z-20 flex justify-between items-center px-5 py-2"
         style={{
@@ -347,7 +448,7 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
           borderTop: '1px solid rgba(120, 255, 214, 0.2)'
         }}
       >
-        {/* Zoom controls */}
+        {/* Left side controls */}
         <div className="flex items-center gap-4">
           <button 
             onClick={zoomOut}
@@ -389,6 +490,12 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
           </button>
         </div>
         
+        {/* Center controls - new */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3 bg-black/70 px-4 py-1.5 rounded-full border border-cyan-500/20">
+          <span className="text-xs text-gray-400">Tip: Usa la rueda o Ctrl+Scroll para hacer zoom</span>
+        </div>
+        
+        {/* Right side controls */}
         <div className="flex items-center gap-4">
           <button 
             onClick={downloadDiagram}
@@ -409,7 +516,24 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
         </div>
       </div>
       
-      {/* Add keyboard shortcuts */}
+      {/* Add keyboard shortcuts help tooltip */}
+      <div className="absolute top-4 left-4 z-20">
+        <button 
+          className="bg-black/70 backdrop-blur-sm p-2 rounded-full text-cyan-400 hover:text-cyan-300 focus:outline-none transition-all border border-cyan-500/20"
+          title="Atajos de teclado"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 4h4v4H2V4z"></path>
+            <path d="M10 4h4v4h-4V4z"></path>
+            <path d="M18 4h4v4h-4V4z"></path>
+            <path d="M2 12h4v4H2v-4z"></path>
+            <path d="M10 12h4v4h-4v-4z"></path>
+            <path d="M18 12h4v4h-4v-4z"></path>
+          </svg>
+        </button>
+      </div>
+      
+      {/* Keyboard shortcuts reference - hidden but accessible via screen readers */}
       <div className="sr-only">
         <p>Keyboard shortcuts:</p>
         <ul>
@@ -417,6 +541,10 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
           <li>Ctrl + '+': Zoom in</li>
           <li>Ctrl + '-': Zoom out</li>
           <li>Ctrl + '0': Reset view</li>
+          <li>Spacebar (mantener): Modo arrastre</li>
+          <li>F: Pantalla completa</li>
+          <li>ESC: Salir de pantalla completa</li>
+          <li>Doble clic: Resetear vista</li>
         </ul>
       </div>
     </div>

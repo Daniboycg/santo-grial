@@ -1,0 +1,110 @@
+# Santo Grial System Prompt
+
+Aplicación para generar JSONs para n8n a partir de interacción con IA.
+
+Este proyecto es una aplicación web que permite a los usuarios interactuar con un agente IA para generar archivos JSON compatibles con n8n. El backend está outsourced y se conecta a través de webhooks. Tu objetivo es crear una aplicación Next.js utilizando tecnologías modernas para construir una plataforma confiable y escalable, con autenticación, autorización y base de datos para registro.
+
+## Contexto del Proyecto
+
+Santo Grial es una aplicación web desarrollada con Next.js y TypeScript que permite a los usuarios interactuar con un agente IA y recibir respuestas que pueden incluir diagramas interactivos. La interfaz sigue un diseño moderno con estética neón y está altamente optimizada para la interacción con diagramas.
+
+# Tecnologías Utilizadas
+
+- **Next.js 14** como framework
+- **TypeScript** para la seguridad de tipos
+- **Tailwind CSS** para el diseño
+- **Supabase** como plataforma principal para:
+  - Base de datos PostgreSQL
+  - Autenticación y autorización
+  - Almacenamiento de archivos
+- **Prisma** como ORM para la base de datos
+- **Sistema de webhooks** para comunicación con el backend
+
+# Funcionalidad Principal
+## 1. Base de Datos
+
+- Esquemas de Prisma conectados a Supabase PostgreSQL
+- Migraciones gestionadas por Prisma
+- Relaciones entre tablas
+- Transacciones
+- Tablas para usuarios y generaciones
+
+## 2. Autenticación y Autorización
+
+- Integración completa de Supabase Auth
+- Sincronización de usuarios entre Supabase y Prisma
+- Modelo de usuario con los siguientes campos:
+  - `id` Int @id @default(autoincrement())
+  - `supabaseUserId` String @unique
+  - `email` String
+  - `name` String
+  - `creditBalance` Int @default(1)
+  - `createdAt` DateTime @default(now())
+  - `updatedAt` DateTime @updatedAt
+- `supabaseUserId` es el identificador principal para todas las relaciones
+
+## 3. Gestión de Archivos
+
+- Integración con Supabase Storage
+- Validación del tipo de archivo
+- Limitaciones de tamaño de archivo
+- Generación de vista previa
+- Seguimiento del estado de la carga
+
+## 4. Preparación para Sistema de Pagos (Futuro)
+
+- Estructura de base de datos para transacciones
+- Rutas API preparadas (sin implementación actual)
+- UI básica para sección de pagos (desactivada)
+
+## 5. Despliegue
+
+- Crear un repositorio en GitHub y subir el proyecto
+- Desplegar en Vercel
+- Agregar variables de entorno
+
+## Estructura del Proyecto
+
+- **prisma**: Definiciones de esquema y migraciones
+- **src/app**: Configuración principal de Next.js y rutas de la aplicación
+- **src/components**: Componentes React organizados por características
+  - **ui**: Componentes de interfaz reutilizables (incluyendo MermaidRenderer)
+  - **chat**: Componentes específicos de la funcionalidad de chat
+  - **auth**: Componentes relacionados con la autenticación
+- **src/lib**: Utilidades, configuraciones y helpers
+  - **db**: Configuración de Prisma y utilidades de base de datos
+  - **supabase**: Cliente y utils de Supabase
+- **src/hooks**: Custom hooks de React para lógica reutilizable
+- **src/services**: Servicios para comunicación con APIs externas y procesamiento
+
+├── .cursorrules
+├── .eslintrc.json
+├── .gitignore
+├── README.md
+├── next-env.d.ts
+├── next.config.js
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── next.svg
+│   └── vercel.svg
+├── src
+│   ├── app
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components
+│   │   ├── chat
+│   │   │   └── ChatWindow.tsx
+│   │   └── ui
+│   │       └── MermaidRenderer.tsx
+│   ├── hooks
+│   │   └── useAgent.ts
+│   └── services
+│       └── agentService.ts
+├── tailwind.config.ts
+└── tsconfig.json
+
+

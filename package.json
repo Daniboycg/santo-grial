@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@supabase/ssr": "^0.6.0",
+    "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/typography": "^0.5.16",
     "axios": "^1.8.1",
     "framer-motion": "^12.4.7",
@@ -29,7 +32,21 @@
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
     "postcss": "^8",
+    "prisma": "^6.5.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+  "main": "next.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Daniboycg/santo-grial.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Daniboycg/santo-grial/issues"
+  },
+  "homepage": "https://github.com/Daniboycg/santo-grial#readme"
 }

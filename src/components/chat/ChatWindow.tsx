@@ -17,17 +17,13 @@ declare global {
   }
 }
 
-// Interfaz para posiciones del diagrama
-interface DiagramPosition {
-  x: number;
-  y: number;
-}
+// Tipos de mensajes
+type MessageRole = 'user' | 'agent';
 
-// Interfaz para el estado del arrastre
-interface DragState {
-  isDragging: boolean;
-  startX: number;
-  startY: number;
+interface Message {
+  role: MessageRole;
+  content: string;
+  id?: number;
 }
 
 interface ChatWindowProps {
@@ -58,15 +54,6 @@ export default function ChatWindow({
   const [mermaidCodeMap, setMermaidCodeMap] = useState<Record<number, string>>({});
   // Estado para forzar la regeneración de un diagrama específico
   const [regenerateIndex, setRegenerateIndex] = useState<number | null>(null);
-  
-  // Estados para manejar el arrastre de diagramas
-  const [diagramPositions, setDiagramPositions] = useState<Record<number, DiagramPosition>>({});
-  const [dragState, setDragState] = useState<DragState>({
-    isDragging: false,
-    startX: 0,
-    startY: 0
-  });
-  const [activeDiagram, setActiveDiagram] = useState<number | null>(null);
   
   // Detectar teclas para atajos
   useEffect(() => {
@@ -251,97 +238,6 @@ export default function ChatWindow({
   };
 
   /**
-   * Inicia el arrastre del diagrama
-   */
-  const handleDiagramMouseDown = (e: React.MouseEvent, index: number) => {
-    // Solo permitir arrastre con clic primario
-    if (e.button !== 0) return;
-    
-    e.preventDefault();
-    
-    // Obtener la posición actual o inicializar a 0,0
-    const currentPosition = diagramPositions[index] || { x: 0, y: 0 };
-    
-    setDragState({
-      isDragging: true,
-      startX: e.clientX - currentPosition.x,
-      startY: e.clientY - currentPosition.y
-    });
-    
-    setActiveDiagram(index);
-    
-    // Actualizar cursor mediante clase CSS
-    const target = e.currentTarget as HTMLElement;
-    target.classList.add('dragging');
-    
-    // Evitar selección de texto
-    document.body.style.userSelect = 'none';
-  };
-  
-  /**
-   * Maneja el movimiento del ratón durante el arrastre
-   */
-  const handleDiagramMouseMove = (e: MouseEvent) => {
-    if (!dragState.isDragging || activeDiagram === null) return;
-    
-    const newPosition = {
-      x: e.clientX - dragState.startX,
-      y: e.clientY - dragState.startY
-    };
-    
-    // Actualizar la posición del diagrama activo
-    setDiagramPositions(prev => ({
-      ...prev,
-      [activeDiagram]: newPosition
-    }));
-  };
-  
-  /**
-   * Finaliza el arrastre del diagrama
-   */
-  const handleDiagramMouseUp = (e: MouseEvent) => {
-    if (!dragState.isDragging) return;
-    
-    setDragState({
-      isDragging: false,
-      startX: 0,
-      startY: 0
-    });
-    
-    // Eliminar clase de arrastre
-    document.querySelectorAll('.mermaid-preview.dragging').forEach(el => {
-      el.classList.remove('dragging');
-    });
-    
-    // Restaurar selección de texto
-    document.body.style.userSelect = '';
-  };
-  
-  /**
-   * Restablece la posición del diagrama a su estado inicial
-   */
-  const resetDiagramPosition = (index: number) => {
-    setDiagramPositions(prev => {
-      const newPositions = { ...prev };
-      delete newPositions[index];
-      return newPositions;
-    });
-  };
-  
-  // Configurar eventos globales de mouse para manejar el arrastre
-  useEffect(() => {
-    if (dragState.isDragging) {
-      window.addEventListener('mousemove', handleDiagramMouseMove);
-      window.addEventListener('mouseup', handleDiagramMouseUp);
-    }
-    
-    return () => {
-      window.removeEventListener('mousemove', handleDiagramMouseMove);
-      window.removeEventListener('mouseup', handleDiagramMouseUp);
-    };
-  }, [dragState, activeDiagram]);
-
-  /**
    * Separa el contenido del código Mermaid para evitar renderizarlo con Markdown
    */
   const processMessageContent = (content: string, index: number) => {
@@ -425,25 +321,11 @@ export default function ChatWindow({
                   {/* Área para la previsualización del diagrama */}
                   <div 
                     className={`mt-3 p-3 bg-white/5 rounded-lg overflow-auto mermaid-preview ${regenerateIndex === index ? 'regenerating-diagram' : ''}`}
-                    onMouseDown={(e) => handleDiagramMouseDown(e, index)}
                   >
                     {/* Indicador de que se puede arrastrar */}
                     <div className="drag-indicator">
                       Arrastra para mover
                     </div>
-                    
-                    {/* Botón para resetear posición */}
-                    {diagramPositions[index] && (
-                      <button 
-                        className="reset-position"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          resetDiagramPosition(index);
-                        }}
-                      >
-                        Centrar
-                      </button>
-                    )}
                     
                     <div className="text-center text-xs text-gray-400 mb-2">
                       Diagrama generado a partir del código Mermaid
@@ -452,11 +334,6 @@ export default function ChatWindow({
                     {/* Aquí iría la previsualización generada por la biblioteca Mermaid */}
                     <div 
                       className="grid-pattern diagram-container"
-                      style={{
-                        transform: diagramPositions[index] 
-                          ? `translate(${diagramPositions[index].x}px, ${diagramPositions[index].y}px)` 
-                          : 'translate(0, 0)'
-                      }}
                     >
                       <div className="mermaid text-center">{mermaidCodeMap[index]}</div>
                     </div>
@@ -633,8 +510,6 @@ export default function ChatWindow({
               disabled={loading}
               placeholder="Escribe un mensaje..."
               className="w-full px-4 py-2 bg-transparent text-white focus:outline-none resize-none min-h-[42px] max-h-[120px]"
-              rows={1}
-              style={{ overflow: inputMessage.length > 100 ? 'auto' : 'hidden' }}
             />
           </div>
           <button
@@ -642,7 +517,8 @@ export default function ChatWindow({
             disabled={loading || !inputMessage.trim()}
             className="px-4 py-2 h-[42px] bg-purple-600 text-white rounded-r-lg 
                      hover:bg-purple-700 focus:outline-none focus:ring-2 
-                     focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                     focus:ring-purple-500 transition-colors disabled:opacity-50 
+                     disabled:cursor-not-allowed"
           >
             Enviar
           </button>
