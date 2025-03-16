@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
 
   // Lista de rutas protegidas que requieren autenticación
-  const protectedRoutes = ['/dashboard', '/profile', '/generate'];
+  const protectedRoutes = ['/chat', '/dashboard', '/profile', '/generate'];
   
   // Comprobar si la ruta actual está protegida
   const isProtectedRoute = protectedRoutes.some(route => 
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
 
   // Si es login y ya hay sesión, redirigir a la página principal
   if (request.nextUrl.pathname === '/login' && session) {
-    const redirectUrl = new URL('/', request.url);
+    const redirectUrl = new URL('/chat', request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -71,6 +71,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Rutas que requieren protección
+    '/chat/:path*',
     '/dashboard/:path*',
     '/profile/:path*',
     '/generate/:path*',
