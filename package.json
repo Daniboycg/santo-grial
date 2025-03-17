@@ -24,6 +24,7 @@
     "react-markdown": "^10.0.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^4.1.2",
     "svix": "^1.61.4"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-# Santo Grial System Prompt
+# MAaaSWC System Prompt
 
 Aplicación para generar JSONs para n8n a partir de interacción con IA.
 
@@ -6,7 +6,7 @@ Este proyecto es una aplicación web que permite a los usuarios interactuar con 
 
 ## Contexto del Proyecto
 
-Santo Grial es una aplicación web desarrollada con Next.js y TypeScript que permite a los usuarios interactuar con un agente IA y recibir respuestas que pueden incluir diagramas interactivos. La interfaz sigue un diseño moderno con estética neón y está altamente optimizada para la interacción con diagramas.
+MultiAgent as a Service Workflow Creator es una aplicación web desarrollada con Next.js y TypeScript que permite a los usuarios interactuar con un agente IA y recibir respuestas que pueden incluir diagramas interactivos. La interfaz sigue un diseño moderno con estética neón y está altamente optimizada para la interacción con diagramas.
 
 # Tecnologías Utilizadas
 
@@ -78,36 +78,93 @@ Santo Grial es una aplicación web desarrollada con Next.js y TypeScript que per
 - **src/hooks**: Custom hooks de React para lógica reutilizable
 - **src/services**: Servicios para comunicación con APIs externas y procesamiento
 
+> tree -I "node_modules|.git|.next|.turbo|dist|build|coverage" -a
+.
 ├── .cursorrules
+├── .env
+├── .env.example
 ├── .eslintrc.json
 ├── .gitignore
 ├── README.md
+├── instructions
+│   └── clerk_docs.md
 ├── next-env.d.ts
 ├── next.config.js
 ├── package-lock.json
 ├── package.json
 ├── postcss.config.js
+├── prisma
+│   ├── migrations
+│   │   ├── 20250316151035_init
+│   │   │   └── migration.sql
+│   │   ├── 20250317005858_migrate_to_clerk
+│   │   │   └── migration.sql
+│   │   ├── 20250317010148_add_clerk_user_id
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
 ├── public
 │   ├── next.svg
 │   └── vercel.svg
 ├── src
 │   ├── app
+│   │   ├── api
+│   │   │   ├── auth
+│   │   │   │   ├── status
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── sync
+│   │   │   │       └── route.ts
+│   │   │   ├── users
+│   │   │   │   └── me
+│   │   │   │       └── route.ts
+│   │   │   ├── webhook
+│   │   │   │   └── generation-callback
+│   │   │   │       └── route.ts
+│   │   │   └── webhooks
+│   │   │       └── clerk
+│   │   │           └── route.ts
+│   │   ├── chat
+│   │   │   └── page.tsx
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.tsx
-│   │   └── page.tsx
+│   │   ├── login
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── sign-in
+│   │   │   └── [[...sign-in]]
+│   │   │       └── page.tsx
+│   │   └── sign-up
+│   │       └── [[...sign-up]]
+│   │           └── page.tsx
 │   ├── components
+│   │   ├── auth
+│   │   │   └── AuthForm.tsx
 │   │   ├── chat
 │   │   │   └── ChatWindow.tsx
 │   │   └── ui
 │   │       └── MermaidRenderer.tsx
 │   ├── hooks
 │   │   └── useAgent.ts
+│   ├── lib
+│   │   ├── clerk
+│   │   │   └── utils.ts
+│   │   ├── db
+│   │   │   └── index.ts
+│   │   └── supabase
+│   │       ├── auth.ts
+│   │       ├── index.ts
+│   │       └── migrations
+│   │           ├── create_users_table.sql
+│   │           └── run_migrations.ts
+│   ├── middleware.ts
 │   └── services
-│       └── agentService.ts
+│       ├── agentService.ts
+│       └── apiService.ts
 ├── tailwind.config.ts
 └── tsconfig.json
 
+37 directories, 47 files
 
 # Próximos Pasos
 

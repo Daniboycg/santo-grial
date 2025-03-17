@@ -4,6 +4,8 @@ import { Webhook } from 'svix';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+// TODO: Implementar servicio de emails
+// import { sendWelcomeEmail } from '@/services/emailService';
 
 /**
  * Handler para los webhooks de Clerk
@@ -95,6 +97,19 @@ export async function POST(req: Request) {
       }
       
       console.log(`Usuario creado: ${id}, ${email}`);
+
+      // 3. Enviar email de bienvenida (comentado hasta implementar servicio de email)
+      /*
+      try {
+        if (email) {
+          const emailSent = await sendWelcomeEmail(email, name || 'Usuario');
+          console.log(`Email de bienvenida para ${email}: ${emailSent ? 'Enviado' : 'Falló'}`);
+        }
+      } catch (emailError) {
+        // No bloqueamos el flujo si falla el envío de email
+        console.error('Error al enviar email de bienvenida:', emailError);
+      }
+      */
     } 
     else if (eventType === 'user.updated') {
       // Actualizar el usuario

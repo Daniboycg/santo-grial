@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { apiService } from '@/services/apiService';
+import { prisma } from '@/lib/db';
+import { sendGenerationCompleteEmail } from '@/services/emailService';
 
 /**
  * Endpoint para recibir las respuestas del backend
@@ -34,6 +36,34 @@ export async function POST(request: Request) {
       jsonResult,
       status || 'completed'
     );
+    
+    // Si la generación se completó con éxito, enviar un email de notificación
+    if (status === 'completed' || !status) {
+      try {
+        // Obtener datos del usuario para el email
+        const generation = await prisma.generation.findUnique({
+          where: { id: updatedGeneration.id },
+          include: { user: true },
+        });
+        
+        if (generation && generation.user) {
+          const { user } = generation;
+          
+          // Enviar email de notificación
+          await sendGenerationCompleteEmail(
+            user.email,
+            user.name || 'Usuario',
+            generation.id.toString(),
+            undefined
+          );
+          
+          console.log(`Email de notificación enviado para la generación ${generation.id}`);
+        }
+      } catch (emailError) {
+        // No bloqueamos el flujo si falla el envío de email
+        console.error('Error al enviar email de notificación de generación:', emailError);
+      }
+    }
     
     return NextResponse.json({
       success: true,
