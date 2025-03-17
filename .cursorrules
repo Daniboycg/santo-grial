@@ -29,20 +29,21 @@ Santo Grial es una aplicación web desarrollada con Next.js y TypeScript que per
 - Transacciones
 - Tablas para usuarios y generaciones
 
-## 2. Autenticación y Autorización
+## 2. Authentication
 
-- Integración completa de Supabase Auth
-- Sincronización de usuarios entre Supabase y Prisma
-- Modelo de usuario con los siguientes campos:
-  - `id` Int @id @default(autoincrement())
-  - `supabaseUserId` String @unique
-  - `email` String
-  - `name` String
-  - `creditBalance` Int @default(1)
-  - `createdAt` DateTime @default(now())
-  - `updatedAt` DateTime @updatedAt
-- `supabaseUserId` es el identificador principal para todas las relaciones
+- Full Clerk integration
+- Webhooks for user.created, user.deleted, user.updated
+- Prisma integration for user data storage
+- With fields:
 
+  id Int @id @default(autoincrement())
+  clerkUserId String @unique
+  email String
+  name String
+  creditBalance Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+- clerkUserId is the primary identifier for all relationships 
 ## 3. Gestión de Archivos
 
 - Integración con Supabase Storage
@@ -108,3 +109,50 @@ Santo Grial es una aplicación web desarrollada con Next.js y TypeScript que per
 └── tsconfig.json
 
 
+# Próximos Pasos
+
+## 1. Migración a Clerk para Autenticación
+
+- Instalar Clerk: `npm install @clerk/nextjs`
+- Configurar variables de entorno (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY)
+- Implementar middleware minimalista con clerkMiddleware
+- Eliminar todos los archivos y código relacionados con Supabase Auth:
+  - Limpiar /src/lib/supabase/auth.ts
+  - Actualizar middleware.ts
+  - Mantener solo la configuración de Supabase para la base de datos
+- Actualizar el componente layout.tsx para incluir ClerkProvider
+
+## 2. Analítica y Monitoreo con PostHog
+
+- Instalar PostHog: `npm install posthog-js`
+- Configurar proveedor de PostHog en layout.tsx
+- Implementar seguimiento de eventos clave:
+  - Registros de usuario
+  - Inicios de sesión
+  - Generaciones de JSON
+  - Errores críticos
+- Configurar funnel de conversión para entender el comportamiento del usuario
+
+## 3. Sistema de Feedback con Discord
+
+- Crear un webhook de Discord para recibir feedback
+- Implementar componente de feedback en la aplicación
+- Configurar notificaciones para nuevos usuarios y eventos importantes
+- Crear canal dedicado para sugerencias y errores reportados
+
+## 4. Email Transaccional con Resend
+
+- Instalar Resend: `npm install resend`
+- Crear plantillas de email para:
+  - Bienvenida al registrarse
+  - Confirmación de generación
+  - Alertas de límite de créditos
+  - Resumen semanal de actividad
+- Implementar colas para envíos masivos
+
+## 5. Desarrollo del Chat con IA
+
+- Implementar la interfaz de chat con streaming de respuestas
+- Conectar con el webhook del backend para procesar solicitudes
+- Añadir soporte para visualización de diagramas Mermaid
+- Implementar sistema de exportación de JSONs para n8n
