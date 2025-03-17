@@ -30,16 +30,6 @@ export default function ChatPage() {
   // Verificación de autenticación con Clerk
   const { isLoaded, userId, sessionId } = useAuth();
   
-  // Si Clerk ya cargó pero no hay sesión, redireccionar a sign-in
-  if (isLoaded && !userId) {
-    return <RedirectToSignIn />;
-  }
-  
-  // Si Clerk aún está cargando, mostrar un indicador de carga
-  if (!isLoaded) {
-    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
-  }
-
   // Sincronizar usuario al cargar la página
   useEffect(() => {
     const syncUserWithDb = async () => {
@@ -75,6 +65,16 @@ export default function ChatPage() {
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
   };
+  
+  // Si Clerk ya cargó pero no hay sesión, redireccionar a sign-in
+  if (isLoaded && !userId) {
+    return <RedirectToSignIn />;
+  }
+  
+  // Si Clerk aún está cargando, mostrar un indicador de carga
+  if (!isLoaded) {
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
+  }
 
   return (
     <main className="app-layout bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 text-white relative">

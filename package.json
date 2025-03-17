@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "migrate:supabase": "ts-node -r tsconfig-paths/register src/lib/supabase/migrations/run_migrations.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.5",
