@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { JetBrains_Mono } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -20,8 +21,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
-      <body className={`${jetbrainsMono.className} font-mono`}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="es">
+        <body className={`${jetbrainsMono.className} font-mono`}>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }

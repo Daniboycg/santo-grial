@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAgent } from '@/hooks/useAgent';
 import ChatWindow from '@/components/chat/ChatWindow';
 import MermaidRenderer from '@/components/ui/MermaidRenderer';
-import { syncUser } from '@/lib/supabase/auth';
+import { useAuth, RedirectToSignIn } from '@clerk/nextjs';
 
 // Interfaz para el usuario
 interface User {
@@ -26,28 +26,43 @@ export default function ChatPage() {
   const [fullscreen, setFullscreen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [syncing, setSyncing] = useState(true);
+  
+  // Verificación de autenticación con Clerk
+  const { isLoaded, userId, sessionId } = useAuth();
+  
+  // Si Clerk ya cargó pero no hay sesión, redireccionar a sign-in
+  if (isLoaded && !userId) {
+    return <RedirectToSignIn />;
+  }
+  
+  // Si Clerk aún está cargando, mostrar un indicador de carga
+  if (!isLoaded) {
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
+  }
 
   // Sincronizar usuario al cargar la página
   useEffect(() => {
     const syncUserWithDb = async () => {
       try {
         setSyncing(true);
-        const response = await fetch('/api/auth/sync');
+        const response = await fetch('/api/users/me');
         if (!response.ok) {
-          console.error('Error al sincronizar usuario:', await response.text());
+          console.error('Error al obtener datos del usuario:', await response.text());
         } else {
           const userData = await response.json();
           setUser(userData);
         }
       } catch (error) {
-        console.error('Error al sincronizar usuario:', error);
+        console.error('Error al obtener datos del usuario:', error);
       } finally {
         setSyncing(false);
       }
     };
 
-    syncUserWithDb();
-  }, []);
+    if (userId) {
+      syncUserWithDb();
+    }
+  }, [userId]);
 
   // When mermaid code is detected, expand the view
   useEffect(() => {

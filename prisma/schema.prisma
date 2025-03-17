@@ -20,7 +20,8 @@ datasource db {
 // Modelo de Usuario
 model User {
   id            Int      @id @default(autoincrement())
-  supabaseUserId String   @unique // ID de usuario en Supabase
+  supabaseUserId String?  @unique // ID de usuario en Supabase (ahora opcional)
+  clerkUserId   String   @unique // ID de usuario en Clerk
   email         String   @unique
   name          String?
   creditBalance Int      @default(1)
