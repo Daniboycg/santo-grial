@@ -35,15 +35,44 @@ export default function ChatPage() {
     const syncUserWithDb = async () => {
       try {
         setSyncing(true);
+        
+        // Primer intento: obtener datos del usuario
         const response = await fetch('/api/users/me');
-        if (!response.ok) {
+        
+        // Si el usuario no existe (404), intentar sincronizarlo
+        if (response.status === 404) {
+          console.log('Usuario no encontrado en la base de datos, intentando sincronización...');
+          
+          // Llamar a la nueva API de sincronización
+          const syncResponse = await fetch('/api/auth/sync', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (!syncResponse.ok) {
+            console.error('Error al sincronizar usuario:', await syncResponse.text());
+            throw new Error('No se pudo sincronizar el usuario. Por favor, intenta de nuevo más tarde.');
+          }
+          
+          // Usuario sincronizado correctamente, obtener los datos
+          const syncedUserData = await syncResponse.json();
+          setUser(syncedUserData);
+          console.log('Usuario sincronizado correctamente:', syncedUserData);
+        } 
+        else if (!response.ok) {
+          // Otro tipo de error diferente a 404
           console.error('Error al obtener datos del usuario:', await response.text());
-        } else {
+          throw new Error('Error al obtener datos del usuario');
+        } 
+        else {
+          // Respuesta correcta, establecer los datos del usuario
           const userData = await response.json();
           setUser(userData);
         }
       } catch (error) {
-        console.error('Error al obtener datos del usuario:', error);
+        console.error('Error al obtener/sincronizar datos del usuario:', error);
       } finally {
         setSyncing(false);
       }
@@ -112,7 +141,7 @@ export default function ChatPage() {
           {!fullscreen && (
             <AnimatePresence>
               <motion.div
-                initial={{ width: 0, opacity: 0 }}
+                initial={{ width: '100%', opacity: 0 }}
                 animate={{ 
                   width: expanded ? '60%' : '100%', 
                   opacity: 1,

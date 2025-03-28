@@ -149,7 +149,7 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [svgContent]);
+  }, [svgContent]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Update zoom level
   useEffect(() => {
@@ -538,9 +538,9 @@ const MermaidRenderer = ({ code, onToggleFullscreen, isFullscreen }: MermaidRend
         <p>Keyboard shortcuts:</p>
         <ul>
           <li>Ctrl + Scroll: Zoom in/out</li>
-          <li>Ctrl + '+': Zoom in</li>
-          <li>Ctrl + '-': Zoom out</li>
-          <li>Ctrl + '0': Reset view</li>
+          <li>Ctrl + &apos;+&apos;: Zoom in</li>
+          <li>Ctrl + &apos;-&apos;: Zoom out</li>
+          <li>Ctrl + &apos;0&apos;: Reset view</li>
           <li>Spacebar (mantener): Modo arrastre</li>
           <li>F: Pantalla completa</li>
           <li>ESC: Salir de pantalla completa</li>

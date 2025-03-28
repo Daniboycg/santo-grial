@@ -34,7 +34,7 @@ export default function LandingPage() {
         <div className="w-full max-w-3xl mb-16">
           <iframe 
             className="w-full aspect-video rounded-lg shadow-2xl"
-            src="https://www.youtube.com/embed/your-video-id"
+            src="https://www.youtube.com/embed/ui-15GsDLH0"
             title="El Secreto de n8n: Multiagentes Que Crean Otros Agentes"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

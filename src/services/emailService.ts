@@ -10,7 +10,13 @@
 
 import { resendClient, DEFAULT_CONFIG, SENDERS } from '@/lib/resend';
 import { welcomeEmailTemplate, generationCompleteTemplate } from '@/lib/resend/templates';
-import { ErrorResponse } from 'resend/build/error';
+
+// Definir nuestra propia interfaz para manejar errores de Resend
+interface ErrorResponse {
+  statusCode?: number;
+  message?: string;
+  name?: string;
+}
 
 /**
  * Logger centralizado para el servicio de email
